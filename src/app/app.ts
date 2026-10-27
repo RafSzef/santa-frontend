@@ -65,9 +65,10 @@ export class App implements OnInit, OnDestroy {
   isClosing = false;
   nextLetterId = 1;
 
-  // Folded envelope in center during owl pick-up
+  // Folded envelope in center during owl pick-up & 3D letter insert/extract choreography
   centerEnvelope: Letter | null = null;
   centerEnvelopeTaken = false;
+  envelopeStage: 'idle' | 'opening' | 'inserting' | 'sealed' = 'idle';
 
   // Animation Flights & Particle Engine
   activeFlights: OwlFlight[] = [];
@@ -547,18 +548,21 @@ export class App implements OnInit, OnDestroy {
       const letter = this.letters[i];
       await this.wait(500);
       const targetPos = this.getTileCenterCoordinates(letter.id);
+      // Since owl flies from right to left (fly-to-left), her beak is at -43px horizontally from owl anchor
+      const slotOwlX = targetPos.x + 43;
+      const slotOwlY = targetPos.y + 8;
       await this.flyOwlWithLetter(
         window.innerWidth + 180,
         -120,
-        targetPos.x,
-        targetPos.y,
+        slotOwlX,
+        slotOwlY,
         letter.from,
-        2400
+        2450
       );
       // Instant reveal at touchdown - zero lag!
       letter.away = false;
       this.cdr.detectChanges();
-      this.sendOwlAway(targetPos.x, targetPos.y);
+      this.sendOwlAway(slotOwlX, slotOwlY);
     }
   }
 
@@ -569,7 +573,8 @@ export class App implements OnInit, OnDestroy {
     tx: number,
     ty: number,
     cargoName: string | undefined,
-    durationMs: number
+    durationMs: number,
+    mode: 'deliver' | 'pickup' | 'carry-climb' = 'deliver'
   ): Promise<void> {
     const flight: OwlFlight = {
       id: ++this.flightCounter,
@@ -579,7 +584,7 @@ export class App implements OnInit, OnDestroy {
       targetY: ty,
       cargoName,
       duration: durationMs,
-      mode: 'deliver',
+      mode,
     };
 
     this.activeFlights = [...this.activeFlights, flight];
@@ -595,10 +600,10 @@ export class App implements OnInit, OnDestroy {
       id: ++this.flightCounter,
       startX: tx,
       startY: ty,
-      targetX: tx > window.innerWidth / 2 ? window.innerWidth + 180 : -180,
-      targetY: ty - 120,
+      targetX: tx > window.innerWidth / 2 ? window.innerWidth + 240 : -240,
+      targetY: ty - 180,
       cargoName: undefined,
-      duration: 1800,
+      duration: 3400,
       mode: 'leave',
     };
 
@@ -608,7 +613,7 @@ export class App implements OnInit, OnDestroy {
     setTimeout(() => {
       this.activeFlights = this.activeFlights.filter(f => f.id !== flight.id);
       this.cdr.detectChanges();
-    }, 1800);
+    }, 3400);
   }
 
   private getTileCenterCoordinates(id: number): { x: number; y: number } {
@@ -685,29 +690,77 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  openLetter(letter: Letter, event: MouseEvent): void {
+  async openLetter(letter: Letter, event: MouseEvent): Promise<void> {
     if (this.busy || letter.away || letter.removing) return;
-    this.activeLetter = structuredClone(letter);
-    this.isEditing = false;
-    this.isNewLetter = false;
-    this.isFolding = false;
-    this.isClosing = false;
-    this.cdr.detectChanges();
+
+    try {
+      this.busy = true;
+      letter.away = true;
+      this.centerEnvelope = structuredClone(letter);
+      this.centerEnvelopeTaken = false;
+      this.envelopeStage = 'opening';
+      this.cdr.detectChanges();
+
+      // Wait for flap to open (0-620ms) and folded parchment to slide out of the pocket (480-1330ms)
+      await this.wait(1360);
+
+      this.centerEnvelope = null;
+      this.envelopeStage = 'idle';
+      this.activeLetter = structuredClone(letter);
+      this.isEditing = false;
+      this.isNewLetter = false;
+      this.isFolding = false;
+      this.isClosing = false;
+      this.cdr.detectChanges();
+    } finally {
+      this.busy = false;
+      this.cdr.detectChanges();
+    }
   }
 
-  // Animated closing of the modal
+  // Animated 3D folding & inserting back into envelope on close
   async closeModal(): Promise<void> {
     if (this.busy || this.isClosing || !this.activeLetter) return;
-    this.isClosing = true;
-    this.cdr.detectChanges();
-    await this.wait(550);
-    this.activeLetter = null;
-    this.isClosing = false;
-    this.isFolding = false;
-    this.cdr.detectChanges();
+
+    try {
+      this.busy = true;
+      const wasNew = this.isNewLetter;
+      const closingCopy = structuredClone(this.activeLetter);
+
+      // 1. Fold the 3 parchment sections up in 3D (calm pace)
+      this.isClosing = true;
+      this.cdr.detectChanges();
+      await this.wait(960);
+
+      this.activeLetter = null;
+      this.isClosing = false;
+      this.isFolding = false;
+
+      if (!wasNew) {
+        // 2. Slide the folded parchment back into the open envelope & close the flap
+        this.centerEnvelope = closingCopy;
+        this.centerEnvelopeTaken = false;
+        this.envelopeStage = 'inserting';
+        this.cdr.detectChanges();
+
+        await this.wait(1520);
+
+        const slotLetter = this.letters.find(l => l.id === closingCopy.id);
+        if (slotLetter) {
+          slotLetter.away = false;
+        }
+        this.centerEnvelope = null;
+        this.envelopeStage = 'idle';
+      }
+
+      this.cdr.detectChanges();
+    } finally {
+      this.busy = false;
+      this.cdr.detectChanges();
+    }
   }
 
-  // Saving letter & Sowa visually picks up the folded envelope from center screen!
+  // Saving letter -> 3D Fold -> Slide into Open Envelope -> Seal Flap -> White Owl Hedwig grabs TOP in beak, flies off-screen & delivers!
   async saveAndSendLetter(): Promise<void> {
     if (this.busy || !this.activeLetter) return;
 
@@ -717,10 +770,10 @@ export class App implements OnInit, OnDestroy {
       // Filter empty gifts
       this.activeLetter.gifts = this.activeLetter.gifts.filter(g => g.name?.trim() || g.url?.trim());
 
-      // 1. 3D Fold the parchment into a sealed envelope in center
+      // 1. 3D Fold the 3 parchment sections into a compact folded packet
       this.isFolding = true;
       this.cdr.detectChanges();
-      await this.wait(750);
+      await this.wait(960);
 
       const letterCopy = structuredClone(this.activeLetter);
       let letterId = letterCopy.id;
@@ -738,42 +791,86 @@ export class App implements OnInit, OnDestroy {
         }
       }
 
-      // Keep the folded envelope floating in center screen for the owl!
+      // 2. Open envelope appears in center -> folded letter slides inside -> flap folds shut -> wax seal stamps!
       this.centerEnvelope = letterCopy;
       this.centerEnvelopeTaken = false;
+      this.envelopeStage = 'inserting';
       this.activeLetter = null;
       this.isClosing = false;
       this.isFolding = false;
-      this.cdr.detectChanges(); // <--- CRITICAL! Center envelope renders!
+      this.cdr.detectChanges();
 
-      // 2. Sowa arrives at center screen, visually grabs the envelope by the top, and carries it to the grid!
-      await this.wait(100);
+      await this.wait(1180);
+      if (this.isBrowser) {
+        this.spawnGoldenStardustBurst(window.innerWidth / 2, window.innerHeight * 0.42, 24);
+      }
+      await this.wait(380);
+
+      this.envelopeStage = 'sealed';
+      this.cdr.detectChanges();
+
+      // 3. White Owl Hedwig swoops in behind the envelope so her BEAK catches the TOP edge seamlessly!
       const targetPos = this.getTileCenterCoordinates(letterId);
       const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight * 0.4;
+      const centerY = window.innerHeight * 0.42;
 
-      // Owl swoops to center screen right above the envelope
-      await this.flyOwlWithLetter(-150, centerY - 80, centerX, centerY, undefined, 1400);
+      // When flying left-to-right, Hedwig's beak is at (+43px, -43px) relative to owl anchor;
+      // the top edge of .center-envelope-carrier is at (centerX, centerY - 86px).
+      const pickupOwlX = centerX - 43;
+      const pickupOwlY = centerY - 43;
 
-      // Sowa visually picks up the envelope!
-      this.centerEnvelopeTaken = true;
-      this.cdr.detectChanges();
-      await this.wait(180);
+      // Schedule envelope-taken 360ms before pickup completes so it scales smoothly into her beak with zero gap!
+      setTimeout(() => {
+        this.centerEnvelopeTaken = true;
+        this.cdr.detectChanges();
+      }, 1590);
+
+      // Hedwig swoops in along a curved arc behind the envelope (z-index 66 < 72) up to its top edge
+      await this.flyOwlWithLetter(-190, pickupOwlY - 90, pickupOwlX, pickupOwlY, undefined, 1950, 'pickup');
+
+      // Instant zero-gap handoff at scale(1)!
       this.centerEnvelope = null;
+      this.envelopeStage = 'idle';
       this.cdr.detectChanges();
 
-      // Sowa carries the envelope with the sender's name to the grid slot
-      await this.flyOwlWithLetter(centerX, centerY, targetPos.x, targetPos.y, letterCopy.from, 2200);
+      // 4. Hedwig dips slightly under the weight of the letter and flaps up in waves off-screen!
+      const offscreenRightX = window.innerWidth + 250;
+      const offscreenHighY = Math.max(35, pickupOwlY - 240);
+      await this.flyOwlWithLetter(
+        pickupOwlX,
+        pickupOwlY,
+        offscreenRightX,
+        offscreenHighY,
+        letterCopy.from,
+        2900,
+        'carry-climb'
+      );
 
-      // Drop envelope into slot INSTANTLY upon touchdown (zero delay!)
+      // Brief turn in the night clouds before swooping back to place the letter in the gallery
+      await this.wait(220);
+
+      // 5. Hedwig swoops back in along a graceful curve from the high right sky to place the letter into its slot!
+      const slotOwlX = targetPos.x + 43;
+      const slotOwlY = targetPos.y + 8;
+      await this.flyOwlWithLetter(
+        window.innerWidth + 220,
+        -100,
+        slotOwlX,
+        slotOwlY,
+        letterCopy.from,
+        2750,
+        'deliver'
+      );
+
+      // Drop envelope into slot INSTANTLY upon touchdown
       const deliveredLetter = this.letters.find(l => l.id === letterId);
       if (deliveredLetter) {
         deliveredLetter.away = false;
         this.cdr.detectChanges();
       }
 
-      // Owl swoops off into the night
-      this.sendOwlAway(targetPos.x, targetPos.y);
+      // Owl flaps her wings and climbs away in a graceful multi-wave arc
+      this.sendOwlAway(slotOwlX, slotOwlY);
     } finally {
       this.busy = false;
       this.cdr.detectChanges();

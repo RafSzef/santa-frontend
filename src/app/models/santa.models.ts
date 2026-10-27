@@ -45,7 +45,7 @@ export interface OwlFlight {
   cargoName?: string;
   cargoLetter?: Letter;
   duration: number;
-  mode: 'deliver' | 'pickup' | 'leave' | 'ambient';
+  mode: 'deliver' | 'pickup' | 'carry-climb' | 'leave' | 'ambient';
 }
 
 export interface PasswordChar {
