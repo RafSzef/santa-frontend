@@ -1,0 +1,1613 @@
+/* ==========================================================================
+   CLASSIC FAIRYTALE STORYBOOK STYLING - SECRET SANTA
+   ========================================================================== */
+
+:host {
+  display: block;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background-color: #040612;
+  color: #f7eed8;
+  font-family: 'Quicksand', sans-serif;
+  user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   Night Sky & World Layer (Slow, majestic 5.5s pan)
+   -------------------------------------------------------------------------- */
+.world {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 200vh;
+  transform: translateY(-100vh);
+  transition: transform 5.5s cubic-bezier(0.25, 1, 0.35, 1);
+  background: linear-gradient(
+    180deg,
+    #02040c 0%,
+    #060a1e 30%,
+    #0d1436 55%,
+    #141a46 75%,
+    #241f44 90%,
+    #362a3f 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+.world.world-high {
+  transform: translateY(0);
+}
+
+/* Subtle Hand-Painted Vintage Paper Grain Overlay */
+.vintage-paper-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(4, 3, 14, 0.5) 100%);
+  pointer-events: none;
+}
+
+/* Starfield */
+.starfield {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+  opacity: 0.7;
+}
+
+.star.twinkle {
+  animation: starTwinkle var(--duration, 3.5s) infinite ease-in-out var(--delay, 0s);
+}
+
+.star.star-bright {
+  border-radius: 0;
+  clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
+  background: #fffbe6;
+  box-shadow: 0 0 10px rgba(255, 245, 190, 0.9);
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* Luminous Fairytale Moon (Upper Sky - complements village moon below) */
+.moon-wrap {
+  position: absolute;
+  right: 14%;
+  top: 12%;
+  width: 110px;
+  height: 110px;
+}
+
+.moon-halo {
+  position: absolute;
+  inset: -42px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 246, 210, 0.32) 0%, rgba(210, 225, 255, 0.12) 45%, rgba(255, 248, 220, 0) 72%);
+  animation: haloPulse 5s infinite ease-in-out;
+}
+
+.moon {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 30%, #fffef7 0%, #f9ebc2 48%, #dfb974 85%, #b88d48 100%);
+  box-shadow:
+    0 0 40px rgba(255, 238, 175, 0.65),
+    0 0 80px rgba(255, 225, 140, 0.3),
+    inset -10px -8px 22px rgba(155, 115, 52, 0.35),
+    inset 4px 4px 12px rgba(255, 255, 245, 0.8);
+  border: 1.5px solid rgba(255, 244, 204, 0.65);
+  overflow: hidden;
+}
+
+.crater {
+  position: absolute;
+  border-radius: 45% 55% 50% 50% / 55% 45% 55% 45%;
+  background: radial-gradient(ellipse at center, rgba(175, 138, 78, 0.22) 0%, rgba(175, 138, 78, 0.05) 75%, transparent 100%);
+  filter: blur(1.5px);
+}
+.crater.c1 { width: 34px; height: 28px; left: 20%; top: 34%; transform: rotate(-15deg); }
+.crater.c2 { width: 24px; height: 20px; left: 56%; top: 20%; transform: rotate(20deg); }
+.crater.c3 { width: 28px; height: 24px; left: 48%; top: 56%; transform: rotate(-8deg); }
+
+@keyframes haloPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.1); }
+}
+
+/* BESPOKE HAND-PAINTED CHRISTMAS FAIRYTALE VILLAGE OIL PAINTING */
+.fairytale-village-painting {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 95vh;
+  min-height: 520px;
+  background-image: url('/village.jpg');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 72%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 72%, rgba(0, 0, 0, 0) 100%);
+  filter: drop-shadow(0 -15px 40px rgba(0, 0, 0, 0.7));
+}
+
+/* --------------------------------------------------------------------------
+   Canvas & Effects Layers
+   -------------------------------------------------------------------------- */
+.particle-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Falling Snow Layer */
+.snow-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  overflow: hidden;
+}
+
+.snowflake {
+  position: absolute;
+  top: -40px;
+  color: #ffffff;
+  font-style: normal;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
+  animation: snowDrift var(--fall-dur, 10s) linear infinite var(--fall-delay, 0s);
+}
+
+@keyframes snowDrift {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.85; }
+  90% { opacity: 0.85; }
+  100% { transform: translate(90px, 105vh) rotate(360deg); opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   Santa's Sleigh Flights (Hand-Painted Illustration Cutout)
+   -------------------------------------------------------------------------- */
+.sleigh-flight {
+  position: fixed;
+  top: 14%;
+  left: 0;
+  width: 540px;
+  height: 235px;
+  pointer-events: none;
+  z-index: 45;
+  animation: sleighCrossing 6.2s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+}
+
+.sleigh-painting {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 6px 16px rgba(0, 0, 0, 0.65))
+    drop-shadow(0 0 18px rgba(255, 210, 110, 0.35));
+  animation: sleighBob 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes sleighCrossing {
+  0% { transform: translateX(-560px); opacity: 0; }
+  10% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateX(105vw); opacity: 0; }
+}
+
+@keyframes sleighBob {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-12px) rotate(-1.5deg); }
+}
+
+/* Ambient Sleigh crossing calmly in the background */
+.ambient-sleigh-flight {
+  position: fixed;
+  top: 14%;
+  left: 0;
+  width: 360px;
+  height: 110px;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0.75;
+  animation: ambientSleighCrossing 9.5s linear forwards;
+}
+
+@keyframes ambientSleighCrossing {
+  0% { transform: translateX(-400px) scale(0.65); opacity: 0; }
+  15% { opacity: 0.75; }
+  85% { opacity: 0.75; }
+  100% { transform: translateX(105vw) scale(0.65); opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   PURE FLOATING PASSWORD INPUT (Crystal clear contrast, ZERO clipping of 'l'!)
+   -------------------------------------------------------------------------- */
+.floating-input-stage {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  pointer-events: auto;
+  transition: transform 5.5s cubic-bezier(0.25, 1, 0.35, 1), opacity 5s ease;
+}
+
+/* Field travels smoothly UPWARDS into the sky */
+.floating-input-stage.stage-moving-up {
+  transform: translateY(-65vh) scale(0.9);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.floating-input-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: text;
+  padding: 24px 44px;
+  background: radial-gradient(ellipse at center, rgba(4, 7, 24, 0.8) 0%, rgba(4, 7, 24, 0.45) 65%, transparent 100%);
+  border-radius: 40px;
+  backdrop-filter: blur(5px);
+  overflow: visible;
+  transition: transform 0.3s ease;
+}
+
+.floating-input-wrap.input-shaking {
+  animation: mysticShake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes mysticShake {
+  10%, 90% { transform: translate3d(-3px, 0, 0); }
+  20%, 80% { transform: translate3d(5px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-7px, 0, 0); }
+  40%, 60% { transform: translate3d(7px, 0, 0); }
+}
+
+/* Native hidden input capturing keystrokes */
+.native-floating-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: text;
+  z-index: 5;
+  font-size: 40px;
+}
+
+/* Floating Cursive Characters Line (Ample height, NEVER clips 'l', 'd', 't'!) */
+.floating-text-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 16px 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+  gap: 2px;
+}
+
+.floating-placeholder {
+  font-family: 'Caveat', cursive;
+  font-size: 54px;
+  color: rgba(255, 235, 180, 0.65);
+  letter-spacing: 2px;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.9);
+  line-height: 1.4;
+  padding: 10px 0;
+}
+
+/* Individual Glyphs: Using text-shadow & color (NEVER CLIPS!) */
+.floating-char {
+  font-family: 'Caveat', cursive;
+  font-size: 72px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  display: inline-block;
+  line-height: 1.4;
+  padding: 14px 5px;
+  margin: 0 1px;
+  overflow: visible;
+  box-sizing: content-box;
+  vertical-align: middle;
+  transition: opacity 0.2s ease, transform 0.2s ease, filter 0.3s ease;
+}
+
+.floating-char.char-gold {
+  color: #ffd859;
+  text-shadow:
+    0 0 12px rgba(255, 215, 0, 0.95),
+    0 0 24px rgba(255, 180, 0, 0.7),
+    0 2px 5px rgba(0, 0, 0, 0.95);
+}
+
+.floating-char.char-red {
+  color: #ff3344;
+  text-shadow:
+    0 0 14px rgba(255, 50, 50, 0.95),
+    0 0 28px rgba(200, 20, 20, 0.8),
+    0 2px 5px rgba(0, 0, 0, 0.95);
+}
+
+/* Disintegration Animation for Crumbling Letters */
+.floating-char.char-dissolving {
+  animation: charDisintegrate 0.32s ease-out forwards !important;
+}
+
+@keyframes charDisintegrate {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.9));
+  }
+  45% {
+    opacity: 0.75;
+    transform: scale(1.08) translateY(-4px) skewX(-10deg);
+    filter: blur(2px) drop-shadow(0 0 20px rgba(255, 100, 0, 1));
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.4) translate(22px, -18px) skewX(-24deg);
+    filter: blur(6px);
+  }
+}
+
+/* Floating Quill Caret */
+.floating-quill-caret {
+  display: inline-block;
+  width: 3px;
+  height: 56px;
+  margin-left: 6px;
+  background: linear-gradient(180deg, #ffffff, #ffd700);
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.95);
+  animation: caretGlowBlink 1.1s infinite alternate ease-in-out;
+}
+
+.floating-quill-caret.at-start {
+  margin-left: 0;
+}
+
+@keyframes caretGlowBlink {
+  0% { opacity: 0.15; transform: scaleY(0.85); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+/* Floating Golden Underline */
+.floating-gold-line {
+  width: min(440px, 80vw);
+  height: 2px;
+  margin-top: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 225, 130, 0.85) 50%, transparent);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+  transition: all 0.4s ease;
+}
+
+.floating-gold-line.line-red {
+  background: linear-gradient(90deg, transparent, rgba(255, 50, 50, 0.85) 50%, transparent);
+  box-shadow: 0 0 16px rgba(255, 40, 40, 0.8);
+}
+
+/* --------------------------------------------------------------------------
+   PURE FAIRYTALE GOLDEN STAR (Bez plusika, bezpieczny odstęp od listów!)
+   -------------------------------------------------------------------------- */
+.fairytale-header {
+  position: fixed;
+  top: 16px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-24px) scale(0.85);
+  transition: opacity 1.4s ease, transform 1.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.fairytale-header.header-bloomed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.star-btn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.pure-fairytale-star-btn {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  outline: none;
+}
+
+.pure-fairytale-star-btn:hover {
+  transform: scale(1.18) rotate(15deg);
+}
+
+.pure-fairytale-star-btn:active {
+  transform: scale(0.95);
+}
+
+.star-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 12px rgba(255, 220, 95, 0.9))
+    drop-shadow(0 0 26px rgba(255, 175, 30, 0.65));
+  animation: starRotateBreathe 8s infinite ease-in-out;
+}
+
+@keyframes starRotateBreathe {
+  0%, 100% { filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.8)); transform: rotate(0deg) scale(1); }
+  50% { filter: drop-shadow(0 0 26px rgba(255, 190, 0, 1)); transform: rotate(180deg) scale(1.08); }
+}
+
+.star-caption {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #faebba;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  background: rgba(8, 12, 36, 0.75);
+  padding: 4px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+}
+
+/* --------------------------------------------------------------------------
+   LETTERS GALLERY & DRIFTING ENVELOPES (Odstęp 195px, brak kolizji!)
+   -------------------------------------------------------------------------- */
+.letters-sky-gallery {
+  position: fixed;
+  inset: 0;
+  padding: 195px 6vw 50px;
+  overflow-y: auto;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.empty-sky-note {
+  text-align: center;
+  margin-top: 40px;
+  padding: 30px;
+  background: rgba(14, 22, 54, 0.65);
+  border: 1.5px dashed rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+  max-width: 480px;
+}
+
+.empty-sky-title {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  color: #faebba;
+  margin-bottom: 8px;
+}
+
+.empty-sky-sub {
+  font-size: 16px;
+  color: #c9bede;
+}
+
+.drifting-letters-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 36px;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 1140px;
+  width: 100%;
+}
+
+/* Each Envelope Drifts & Levitates Gently in the Air */
+.envelope-drift-slot {
+  position: relative;
+  width: 250px;
+  min-height: 165px;
+  cursor: pointer;
+  animation: gentleDrift var(--drift-dur, 4.5s) ease-in-out infinite alternate var(--drift-delay, 0s);
+  transition: opacity 0.35s ease;
+}
+
+@keyframes gentleDrift {
+  0% {
+    transform: translateY(0px) rotate(var(--rot, -1deg));
+  }
+  50% {
+    transform: translateY(-9px) rotate(calc(var(--rot, -1deg) + 1.8deg));
+  }
+  100% {
+    transform: translateY(-3px) rotate(calc(var(--rot, -1deg) - 1.2deg));
+  }
+}
+
+.envelope-drift-slot:hover {
+  animation-play-state: paused;
+  transform: translateY(-10px) scale(1.04) rotate(0deg) !important;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.envelope-drift-slot.slot-away {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.envelope-drift-slot.slot-removing {
+  animation: removeWindFade 0.85s forwards ease-in-out;
+}
+
+@keyframes removeWindFade {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.1) rotate(8deg) translateY(-20px); opacity: 0.6; filter: blur(2px); }
+  100% { transform: scale(0.3) rotate(25deg) translateY(-60px); opacity: 0; filter: blur(6px); }
+}
+
+/* Vintage Hand-Painted Parchment Envelope */
+.envelope-parchment {
+  position: relative;
+  width: 100%;
+  min-height: 165px;
+  border-radius: 10px;
+  background-image: url('/parchment.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #b8925a;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.25),
+    inset 0 0 18px rgba(140, 98, 45, 0.22);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 18px 14px;
+  overflow: hidden;
+}
+
+.envelope-flap-sketch {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.envelope-inner-border {
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(160, 120, 62, 0.45);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Delete Button: INSIDE the envelope card, always visible and stable! */
+.delete-envelope-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid #caa872;
+  background: #fbf5e6;
+  color: #8b2b2b;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  opacity: 0.75;
+  transform: scale(0.95);
+  transition: all 0.25s ease;
+  z-index: 8;
+}
+
+.envelope-drift-slot:hover .delete-envelope-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.delete-envelope-btn:hover {
+  background: #8b2b2b;
+  color: #ffffff;
+  border-color: #8b2b2b;
+  transform: scale(1.15) !important;
+}
+
+/* Sender Name Area - Fully Visible, Wraps Gracefully */
+.envelope-name-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  width: 90%;
+  margin-top: -4px;
+}
+
+.from-label {
+  font-size: 12px;
+  color: #7d5b3a;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.from-name {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 700;
+  color: #2b180d;
+  line-height: 1.15;
+  text-align: center;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  margin-top: 2px;
+}
+
+/* Hand-Stamped Organic Wax Seal */
+.wax-seal-badge {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 52% 48% 54% 46% / 47% 53% 48% 52%;
+  background: radial-gradient(circle at 35% 32%, #c9302c 0%, #941414 62%, #590808 100%);
+  border: 2px solid #6e1111;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.45),
+    inset 0 2px 5px rgba(255, 175, 160, 0.4),
+    inset -2px -2px 5px rgba(45, 4, 4, 0.65);
+  display: grid;
+  place-items: center;
+  transform: rotate(-6deg);
+  z-index: 3;
+}
+
+.seal-glyph {
+  color: #f7e4bc;
+  font-size: 16px;
+  text-shadow: 0 1px 2px rgba(45, 4, 4, 0.85);
+  opacity: 0.92;
+}
+
+/* Vintage Postmark */
+.vintage-postmark {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  border: 1.5px dashed #a08055;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #8c6f47;
+  letter-spacing: 0.8px;
+  transform: rotate(-7deg);
+  opacity: 0.7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.postmark-year {
+  font-size: 8px;
+}
+
+.vintage-postmark.postmark-child {
+  border-color: #2c6b3f;
+  color: #245834;
+}
+
+.child-envelope-tag {
+  margin-top: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  color: #215432;
+  background: rgba(46, 117, 68, 0.12);
+  border: 1px dashed rgba(46, 117, 68, 0.45);
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   CENTER FOLDED ENVELOPE (Visible for Owl to visually pick up!)
+   -------------------------------------------------------------------------- */
+.center-envelope-carrier {
+  position: fixed;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  z-index: 65;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.center-envelope-carrier.envelope-taken {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+}
+
+/* --------------------------------------------------------------------------
+   OWL FLIGHT & SVGS (Forward Profile Flight - 100% Reliable Keyframes)
+   -------------------------------------------------------------------------- */
+.owl-in-flight {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 70;
+  pointer-events: none;
+}
+
+.owl-in-flight.flying-mode {
+  animation: owlFlyTrajectory var(--dur, 2200ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.owl-in-flight.leaving-mode {
+  animation: owlLeaveTrajectory var(--dur, 1800ms) cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.owl-in-flight.ambient-mode {
+  animation: owlAmbientTrajectory var(--dur, 5500ms) linear forwards;
+}
+
+@keyframes owlFlyTrajectory {
+  0% {
+    transform: translate(var(--start-x), var(--start-y)) scale(0.75);
+  }
+  100% {
+    transform: translate(var(--target-x), var(--target-y)) scale(1);
+  }
+}
+
+@keyframes owlLeaveTrajectory {
+  0% {
+    transform: translate(var(--target-x), var(--target-y)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(var(--target-x) + 380px),
+      calc(var(--target-y) - 480px)
+    ) scale(0.35);
+    opacity: 0;
+  }
+}
+
+@keyframes owlAmbientTrajectory {
+  0% { transform: translate(var(--start-x), var(--start-y)) scale(0.55); opacity: 0; }
+  15% { opacity: 0.85; }
+  85% { opacity: 0.85; }
+  100% { transform: translate(var(--target-x), var(--target-y)) scale(0.55); opacity: 0; }
+}
+
+.owl-creature {
+  position: relative;
+  left: -110px;
+  top: -120px;
+  width: 220px;
+  height: 144px;
+}
+
+/* Hand-Painted Multi-Layer Owl Rig with Bob Animation */
+.owl-painted-rig {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.55));
+  animation: owlSwoopBob 0.75s ease-in-out infinite alternate;
+}
+
+.owl-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.owl-wing-far-img {
+  z-index: 1;
+  transform-origin: 67% 37%;
+  animation: flapFar 0.36s infinite alternate ease-in-out;
+}
+
+.owl-body-img {
+  z-index: 3;
+}
+
+.owl-wing-near-img {
+  z-index: 4;
+  transform-origin: 47% 50%;
+  animation: flapNear 0.36s infinite alternate ease-in-out;
+}
+
+@keyframes owlSwoopBob {
+  0% { transform: translateY(0) rotate(-2.5deg); }
+  100% { transform: translateY(-13px) rotate(3.5deg); }
+}
+
+/* Forward Flight Orientation - flip the creature wrapper */
+.owl-in-flight.fly-to-left .owl-creature {
+  transform: scaleX(-1);
+}
+
+/* Un-mirror the cargo text when owl is flipped */
+.owl-in-flight.fly-to-left .cargo-envelope-body {
+  transform: scaleX(-1);
+}
+
+@keyframes flapNear {
+  0% { transform: rotate(9deg) scaleY(1.02); }
+  100% { transform: rotate(-16deg) scaleY(0.84); }
+}
+
+@keyframes flapFar {
+  0% { transform: rotate(-7deg) scaleY(1.02); }
+  100% { transform: rotate(13deg) scaleY(0.86); }
+}
+
+/* Sowa trzyma kopertę ZA GÓRNĄ KRAWĘDŹ w swoich malowanych szponach */
+.owl-cargo-envelope {
+  position: absolute;
+  left: 58%;
+  top: 122px;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.cargo-envelope-body {
+  position: relative;
+  width: 128px;
+  min-height: 70px;
+  background-image: url('/parchment.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 1.5px solid #b8925a;
+  border-radius: 5px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(140, 98, 45, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 8px 6px;
+  overflow: hidden;
+}
+
+.cargo-flap-sketch {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cargo-seal {
+  color: #9e1b1b;
+  font-size: 14px;
+  z-index: 1;
+}
+
+.cargo-recipient {
+  font-family: 'Caveat', cursive;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2b180d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 85px;
+  z-index: 1;
+}
+
+/* --------------------------------------------------------------------------
+   PARCHMENT LETTER MODAL (3-Fold 3D Unfold & Animated Closing)
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 7, 20, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 75;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 50px 20px;
+  overflow-y: auto;
+  transition: opacity 0.55s ease;
+}
+
+.modal-backdrop.backdrop-closing {
+  opacity: 0;
+}
+
+.parchment-sheet {
+  width: 100%;
+  max-width: 620px;
+  perspective: 1200px;
+  margin: auto;
+  filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.65));
+  overflow: hidden;
+}
+
+.parchment-fold {
+  background-image: url('/parchment_clean.jpg');
+  background-size: 100% 300%;
+  background-repeat: no-repeat;
+  border: 2px solid #b8925a;
+  padding: 24px 28px;
+  position: relative;
+  backface-visibility: hidden;
+  transform-origin: top center;
+  box-shadow: inset 0 0 22px rgba(160, 118, 58, 0.18);
+}
+
+.fold-top {
+  background-position: top center;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px dashed rgba(160, 118, 58, 0.45);
+  animation: unfoldTop 0.55s ease-out forwards;
+}
+
+.fold-middle {
+  background-position: center center;
+  border-top: none;
+  border-bottom: 1px dashed rgba(160, 118, 58, 0.45);
+  animation: unfoldMiddle 0.65s 0.15s ease-out both;
+}
+
+.fold-bottom {
+  background-position: bottom center;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  animation: unfoldBottom 0.65s 0.35s ease-out both;
+}
+
+/* Reverse Fold-Up Closing Animation */
+.sheet-folding .fold-bottom {
+  animation: foldBottom 0.45s ease-in forwards !important;
+}
+
+.sheet-folding .fold-middle {
+  animation: foldMiddle 0.45s 0.18s ease-in forwards !important;
+}
+
+.sheet-folding .fold-top {
+  animation: foldTop 0.4s 0.36s ease-in forwards !important;
+}
+
+@keyframes unfoldTop {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes unfoldMiddle {
+  from { opacity: 0; transform: rotateX(-80deg); }
+  to { opacity: 1; transform: rotateX(0deg); }
+}
+
+@keyframes unfoldBottom {
+  from { opacity: 0; transform: rotateX(-80deg); }
+  to { opacity: 1; transform: rotateX(0deg); }
+}
+
+@keyframes foldBottom {
+  from { opacity: 1; transform: rotateX(0deg); }
+  to { opacity: 0; transform: rotateX(-90deg); }
+}
+
+@keyframes foldMiddle {
+  from { opacity: 1; transform: rotateX(0deg); }
+  to { opacity: 0; transform: rotateX(-90deg); }
+}
+
+@keyframes foldTop {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-30px) scale(0.9); }
+}
+
+/* Modal Content Styles */
+.fairytale-ribbon {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.ribbon-text {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #7d2626;
+  letter-spacing: 1.5px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.child-letter-subtitle {
+  margin-top: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #215432;
+}
+
+/* Letter Type Toggle in Top Fold */
+.letter-type-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.type-toggle-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.type-toggle-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1.5px solid #caa872;
+  background: rgba(253, 245, 223, 0.65);
+  color: #5a3d24;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.type-toggle-btn:hover {
+  background: rgba(212, 175, 55, 0.22);
+}
+
+.type-toggle-btn.type-active {
+  background: linear-gradient(135deg, #9e2a2b, #73191a);
+  color: #fff9ea;
+  border-color: #5c1010;
+  box-shadow: 0 2px 8px rgba(120, 20, 20, 0.3);
+}
+
+.type-toggle-btn.type-child-btn.type-active {
+  background: linear-gradient(135deg, #2b6a3e, #1b4928);
+  color: #f4fbf6;
+  border-color: #13351d;
+  box-shadow: 0 2px 8px rgba(27, 73, 40, 0.35);
+}
+
+.sender-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.vintage-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #6b4e31;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 80px;
+}
+
+.sender-calligraphy {
+  font-family: 'Caveat', cursive;
+  font-size: 34px;
+  font-weight: 700;
+  color: #2b180d;
+}
+
+.letter-story-text {
+  font-family: 'Caveat', cursive;
+  font-size: 28px;
+  color: #2b180d;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  margin: 8px 0;
+}
+
+/* Wishlist Section */
+.wishlist-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.wishlist-heading {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #6b4e31;
+  letter-spacing: 1px;
+}
+
+.gifts-scroll-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.empty-wishlist-hint {
+  font-style: italic;
+  font-size: 14px;
+  color: #8c7358;
+}
+
+.gift-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.gift-display-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font-size: 18px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border-bottom: 1px dotted rgba(184, 148, 86, 0.35);
+  transition: background 0.25s ease, border-color 0.25s ease, opacity 0.3s ease;
+}
+
+/* Selected state (Wybrany prezent w liście dla dzieci) */
+.gift-display-item.gift-display-selected {
+  background: rgba(212, 175, 55, 0.22);
+  border: 1.5px solid rgba(180, 130, 35, 0.65);
+  box-shadow: 0 2px 8px rgba(180, 130, 35, 0.15);
+}
+
+/* Claimed / Stamped state (Zaopatrzony / Zaopiekowany przez Elfy -> wyszarzenie i koniec interakcji) */
+.gift-item-row.gift-row-claimed {
+  pointer-events: none;
+  user-select: none;
+}
+
+.gift-item-row.gift-row-claimed .parchment-input {
+  background: rgba(215, 206, 190, 0.55);
+  border-color: rgba(150, 140, 125, 0.5);
+  color: #7a7064;
+  text-decoration: line-through;
+  pointer-events: none;
+}
+
+.gift-display-item.gift-display-claimed {
+  background: rgba(140, 132, 118, 0.14);
+  border-bottom: 1px dotted rgba(130, 122, 110, 0.35);
+  pointer-events: none;
+  user-select: none;
+}
+
+.gift-display-item.gift-display-claimed .gift-bullet-star {
+  color: #968c7e;
+  opacity: 0.55;
+}
+
+.gift-display-item.gift-display-claimed .gift-title-wrap {
+  opacity: 0.52;
+  filter: grayscale(0.85);
+}
+
+.claimed-strikethrough {
+  text-decoration: line-through;
+  color: #6e6459 !important;
+}
+
+.gift-title-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Children's Letter Gift Selection Toggle Button */
+.child-gift-select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1.5px solid #9c7a44;
+  background: #fbf3de;
+  color: #4d3319;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.child-gift-select-btn:hover {
+  background: #f3e2b8;
+  border-color: #7a5826;
+}
+
+.child-gift-select-btn.is-selected {
+  background: #2b6a3e;
+  border-color: #1a4727;
+  color: #ffffff;
+}
+
+.select-box-icon {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  border: 1.5px solid currentColor;
+  display: inline-grid;
+  place-items: center;
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* Action Button to Stamp Selected Gift as Provided (Zaopatrzony) */
+.elf-confirm-stamp-btn {
+  margin-left: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1.5px solid #163d22;
+  background: linear-gradient(135deg, #2e7343, #1d4f2c);
+  color: #f7fdf9;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(29, 79, 44, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+
+.elf-confirm-stamp-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 4px 12px rgba(29, 79, 44, 0.5);
+}
+
+/* Hand-Crafted Elf Stamp ("Pieczątka od Elfów - Zaopatrzony / Zaopiekowany") */
+.elf-stamp-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 2px double #255c36;
+  border-radius: 6px;
+  color: #255c36;
+  background: rgba(37, 92, 54, 0.08);
+  box-shadow: inset 0 0 6px rgba(37, 92, 54, 0.14);
+  transform: rotate(-4.5deg);
+  flex-shrink: 0;
+  opacity: 0.9;
+  animation: elfStampSlam 0.38s cubic-bezier(0.22, 1.28, 0.36, 1) forwards;
+}
+
+.elf-stamp-badge.stamp-compact {
+  padding: 4px 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+@keyframes elfStampSlam {
+  0% {
+    opacity: 0;
+    transform: scale(1.85) rotate(-14deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-3deg);
+  }
+  100% {
+    opacity: 0.9;
+    transform: scale(1) rotate(-4.5deg);
+  }
+}
+
+.elf-stamp-icon {
+  width: 22px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.stamp-lines {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.stamp-top-line {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.stamp-main-line {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.gift-bullet-star {
+  color: #d4af37;
+  font-size: 14px;
+}
+
+.gift-storybook-link {
+  color: #8a1f1f;
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+}
+
+.gift-storybook-link:hover {
+  color: #b82222;
+  text-decoration: underline;
+}
+
+.external-icon {
+  font-size: 12px;
+}
+
+.gift-storybook-name {
+  color: #2b180d;
+  font-weight: 600;
+}
+
+/* Inputs in Parchment */
+.parchment-input,
+.parchment-textarea {
+  background: #fdf5df;
+  border: 1.5px solid #caa872;
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: #2b180d;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+  outline: none;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.parchment-input:focus,
+.parchment-textarea:focus {
+  border-color: #9e2a2b;
+  box-shadow: 0 0 8px rgba(158, 42, 43, 0.25);
+}
+
+.sender-edit-input {
+  font-family: 'Caveat', cursive;
+  font-size: 26px;
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.parchment-textarea {
+  width: 100%;
+  font-family: 'Caveat', cursive;
+  font-size: 24px;
+  line-height: 1.25;
+  resize: vertical;
+}
+
+.gift-field-name { flex: 2; }
+.gift-field-url { flex: 3; }
+
+.gift-remove-btn {
+  background: none;
+  border: none;
+  color: #9e2a2b;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.gift-remove-btn:hover {
+  background: rgba(158, 42, 43, 0.1);
+}
+
+/* Modal Buttons */
+.parchment-btn {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 8px 18px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 12px;
+  background: rgba(212, 175, 55, 0.2);
+  color: #5a3d24;
+  border: 1px solid #caa872;
+}
+
+.btn-sm:hover {
+  background: rgba(212, 175, 55, 0.4);
+}
+
+.parchment-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-close-modal {
+  background: #ecd9ab;
+  color: #3b2713;
+  border: 1.5px solid #caa872;
+}
+
+.btn-close-modal:hover {
+  background: #dfc791;
+}
+
+.btn-send-with-owl {
+  background: linear-gradient(135deg, #a82222, #7a1212);
+  color: #fff9ea;
+  border: 1.5px solid #570909;
+  box-shadow: 0 4px 12px rgba(120, 18, 18, 0.4);
+}
+
+.btn-send-with-owl:hover {
+  background: linear-gradient(135deg, #bf2626, #8f1515);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(120, 18, 18, 0.5);
+}
+
+/* --------------------------------------------------------------------------
+   MOBILE RESPONSIVENESS
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .floating-placeholder {
+    font-size: 40px;
+  }
+  .floating-char {
+    font-size: 48px;
+    padding: 10px 2px;
+  }
+  .floating-quill-caret {
+    height: 44px;
+  }
+  .letters-sky-gallery {
+    padding: 175px 4vw 35px;
+  }
+  .envelope-drift-slot {
+    width: min(290px, 88vw);
+  }
+  .drifting-letters-grid {
+    gap: 24px;
+  }
+  .fairytale-village-painting {
+    height: 70vh;
+    min-height: 380px;
+  }
+
+  /* Modal fits mobile screens */
+  .modal-backdrop {
+    padding: 20px 10px;
+  }
+  .parchment-fold {
+    padding: 16px 14px;
+  }
+  .sender-input-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .sender-edit-input {
+    width: 100%;
+    font-size: 22px;
+  }
+  .vintage-label {
+    min-width: auto;
+    font-size: 13px;
+  }
+  .ribbon-text {
+    font-size: 16px;
+  }
+  .parchment-textarea {
+    font-size: 20px;
+  }
+
+  /* Gift row stacks vertically on mobile */
+  .gift-item-row {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .gift-field-name,
+  .gift-field-url {
+    flex: unset;
+    width: 100%;
+    min-width: 0;
+  }
+  .gift-display-item {
+    flex-wrap: wrap;
+  }
+  .parchment-modal-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .parchment-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
