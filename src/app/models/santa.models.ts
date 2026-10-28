@@ -1,7 +1,7 @@
 export type LetterType = 'standard' | 'child';
 
 export interface Gift {
-  id?: string;
+  id?: number | string;
   name: string;
   url: string;
   selected?: boolean;
@@ -16,6 +16,13 @@ export interface Letter {
   gifts: Gift[];
   away?: boolean;
   removing?: boolean;
+  dementorAttacking?: boolean;
+}
+
+export interface PageResponse {
+  code: string;
+  updatedAt?: string;
+  letters: Letter[];
 }
 
 export interface Particle {
@@ -30,7 +37,7 @@ export interface Particle {
   life: number;
   maxLife: number;
   color: string;
-  type: 'ember' | 'spark' | 'gold' | 'smoke' | 'scrap';
+  type: 'ember' | 'spark' | 'gold' | 'smoke' | 'scrap' | 'dementor' | 'soul';
   rotation?: number;
   vRot?: number;
   wobbleSpeed?: number;
@@ -42,6 +49,7 @@ export interface OwlFlight {
   startY: number;
   targetX: number;
   targetY: number;
+  hasCargo?: boolean;
   cargoName?: string;
   cargoLetter?: Letter;
   duration: number;
