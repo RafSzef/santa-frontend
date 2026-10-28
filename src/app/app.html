@@ -67,7 +67,7 @@
 
 <!-- Snow Layer -->
 @if (snowActive) {
-  <div class="snow-layer">
+  <div class="snow-layer" [class.snow-stopping]="snowStopping">
     @for (flake of snowflakes; track $index) {
       <i class="snowflake"
          [style.left.%]="flake.x"
@@ -92,49 +92,272 @@
   </div>
 }
 
-<!-- PURE FLOATING PASSWORD INPUT (Ample clearance for tall letters like 'l', travels UP!) -->
-@if (phase === 'login' || pwMovingUp) {
-  <div class="floating-input-stage" [class.stage-moving-up]="pwMovingUp">
-    <div class="floating-input-wrap"
-         [class.input-shaking]="shakeError"
-         (click)="focusInput()">
-      
-      <!-- Native Hidden Input for Keyboard Focus -->
-      <input #pwInputRef
-             type="text"
-             class="native-floating-input"
-             [(ngModel)]="pw"
-             (ngModelChange)="onPwChange()"
-             (keydown.enter)="submitPassword()"
-             [disabled]="busy || isSubmitting"
-             autocomplete="off"
-             spellcheck="false"
-             autofocus />
+<!-- 404 NOT FOUND STAGE: Skrzaty schowały tę stronę! -->
+@if (is404) {
+  <div class="notfound-stage">
+    <div class="notfound-parchment-scroll">
+      <div class="scroll-corner top-left"></div>
+      <div class="scroll-corner top-right"></div>
+      <div class="scroll-corner bottom-left"></div>
+      <div class="scroll-corner bottom-right"></div>
 
-      <!-- Rendered Handwritten Characters (Ample height so 'l' is NEVER cut off!) -->
-      <div class="floating-text-line">
-        @if (pwLetters.length === 0) {
-          <span class="floating-placeholder">Podaj hasło...</span>
-        } @else {
-          @for (item of pwLetters; track item.id; let idx = $index) {
-            <span #letterDomRef
-                  class="floating-char"
-                  [class.char-red]="pwState === 'error'"
-                  [class.char-gold]="pwState !== 'error'"
-                  [class.char-dissolving]="item.dissolved">
-              {{ item.char }}
-            </span>
-          }
-        }
-        @if (!isSubmitting) {
-          <span class="floating-quill-caret" [class.at-start]="pwLetters.length === 0"></span>
-        }
+      <!-- Wax Seal Badge -->
+      <div class="notfound-wax-seal">
+        <span class="seal-icon">404</span>
       </div>
 
-      <!-- Subtle Golden Underline in the Air -->
-      <div class="floating-gold-line" [class.line-red]="pwState === 'error'"></div>
+      <!-- Zgredek-like mischievous house elf illustration / animation -->
+      <div class="elf-scene" (click)="onElfClick($event)" [class.elf-bounce]="elfSqueaking" title="Kliknij psotnego skrzata!">
+        <svg class="elf-svg" viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="elfSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#dfcfb8" />
+              <stop offset="100%" stop-color="#c4b096" />
+            </linearGradient>
+            <linearGradient id="tunicGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#705641" />
+              <stop offset="100%" stop-color="#4e3827" />
+            </linearGradient>
+          </defs>
+
+          <!-- Shadow -->
+          <ellipse cx="120" cy="165" rx="55" ry="9" fill="rgba(0,0,0,0.3)" />
+
+          <!-- Left House-Elf Bat Ear (Twitches with CSS animation!) -->
+          <g class="elf-ear-left">
+            <path d="M 95 80 C 60 70 20 40 10 32 C 8 30 18 60 45 85 C 65 100 85 95 95 80 Z" 
+                  fill="url(#elfSkin)" stroke="#8c735a" stroke-width="2" />
+            <path d="M 85 80 C 60 70 30 48 24 44 C 34 65 55 84 75 88 Z" 
+                  fill="#c8a892" opacity="0.65" />
+          </g>
+
+          <!-- Right House-Elf Bat Ear (Twitches in counter-sync!) -->
+          <g class="elf-ear-right">
+            <path d="M 145 80 C 180 70 220 40 230 32 C 232 30 222 60 195 85 C 175 100 155 95 145 80 Z" 
+                  fill="url(#elfSkin)" stroke="#8c735a" stroke-width="2" />
+            <path d="M 155 80 C 180 70 210 48 216 44 C 206 65 185 84 165 88 Z" 
+                  fill="#c8a892" opacity="0.65" />
+          </g>
+
+          <!-- Tattered Pillowcase Tunic with Christmas Sock Patch -->
+          <path d="M 90 115 Q 120 105 150 115 L 165 160 Q 120 168 75 160 Z" fill="url(#tunicGrad)" />
+          <path d="M 100 130 L 112 130 L 114 145 L 120 148 L 117 154 L 105 154 L 105 130 Z" 
+                fill="#b83232" stroke="#d4af37" stroke-dasharray="2,2" stroke-width="1.2" />
+
+          <!-- Elf Head -->
+          <ellipse cx="120" cy="85" rx="32" ry="34" fill="url(#elfSkin)" stroke="#8c735a" stroke-width="1.8" />
+
+          <!-- Expressive Big Eyes (Blinks with CSS animation!) -->
+          <g class="elf-eyes">
+            <ellipse cx="106" cy="80" rx="9" ry="11" fill="#fffdec" stroke="#634c38" stroke-width="1.2" />
+            <circle class="elf-pupil" cx="107" cy="81" r="5.5" fill="#3a5a40" />
+            <circle class="elf-pupil-center" cx="107" cy="81" r="3.2" fill="#141e17" />
+            <circle cx="109" cy="78" r="2" fill="#ffffff" />
+
+            <ellipse cx="134" cy="80" rx="9" ry="11" fill="#fffdec" stroke="#634c38" stroke-width="1.2" />
+            <circle class="elf-pupil" cx="133" cy="81" r="5.5" fill="#3a5a40" />
+            <circle class="elf-pupil-center" cx="133" cy="81" r="3.2" fill="#141e17" />
+            <circle cx="135" cy="78" r="2" fill="#ffffff" />
+          </g>
+
+          <!-- Pointy Nose -->
+          <path d="M 120 79 C 117 92 113 97 120 98 C 127 97 123 92 120 79 Z" fill="#bfa88f" />
+
+          <!-- Mischievous Smirk / Smile -->
+          <path d="M 111 106 Q 120 114 129 106" fill="none" stroke="#6e5038" stroke-width="2.2" stroke-linecap="round" />
+
+          <!-- Whimsical Wrinkles / Freckles on Cheeks -->
+          <circle cx="102" cy="94" r="1" fill="#9d7e65" />
+          <circle cx="100" cy="97" r="0.9" fill="#9d7e65" />
+          <circle cx="138" cy="94" r="1" fill="#9d7e65" />
+          <circle cx="140" cy="97" r="0.9" fill="#9d7e65" />
+
+          <!-- Hands Sneakily Grasping a Stolen Parchment Roll -->
+          <g class="elf-hands">
+            <circle cx="85" cy="132" r="6" fill="#c4b096" stroke="#8c735a" stroke-width="1.2" />
+            <circle cx="155" cy="132" r="6" fill="#c4b096" stroke="#8c735a" stroke-width="1.2" />
+            <rect x="76" y="130" width="88" height="11" rx="4" fill="#ede0c8" stroke="#8c735a" stroke-width="1.2" />
+            <rect x="117" y="129" width="6" height="13" fill="#a62929" />
+          </g>
+        </svg>
+
+        <div class="elf-click-hint">✨ Kliknij skrzata!</div>
+      </div>
+
+      <!-- Heading & Story Text -->
+      <h1 class="notfound-title">Skrzaty schowały tę stronę!</h1>
+      
+      <p class="notfound-desc">
+        Ojej! Psotne skrzaty domowe zwinęły tę skrzynkę pod osłoną nocy,
+        zawinęły w stary pergamin i ukryły głęboko w zakamarkach zamku.
+      </p>
+
+      @if (notFoundCode) {
+        <div class="notfound-code-badge">
+          <span class="badge-prefix">Poszukiwany adres:</span>
+          <span class="badge-code">/{{ notFoundCode }}</span>
+        </div>
+      }
+
+      <div class="notfound-actions">
+        <button class="parchment-btn notfound-btn-home" (click)="resetToHome()">
+          🏰 Wróć na stronę główną
+        </button>
+
+        @if (notFoundCode) {
+          <button class="parchment-btn notfound-btn-create" (click)="createFrom404()">
+            📜 Stwórz tę stronę
+          </button>
+        }
+      </div>
     </div>
   </div>
+}
+
+<!-- PURE FLOATING PASSWORD INPUT OR HOME PORTAL -->
+@if (!is404 && (phase === 'login' || pwMovingUp)) {
+  @if (!currentRoomCode && !pwMovingUp) {
+    <!-- HOME PAGE HERO PORTAL -->
+    <div class="home-portal-stage">
+      <div class="home-portal-scroll">
+        <div class="scroll-corner top-left"></div>
+        <div class="scroll-corner top-right"></div>
+        <div class="scroll-corner bottom-left"></div>
+        <div class="scroll-corner bottom-right"></div>
+
+        <!-- Decorative Crown Wax Seal -->
+        <div class="home-wax-seal">
+          <span class="home-seal-icon">✦</span>
+        </div>
+
+        <header class="home-hero-header">
+          <div class="home-emblem">🎄 ✨ 🦉</div>
+          <h1 class="home-title">Poczta Świętego Mikołaja</h1>
+          <p class="home-subtitle">
+            Magiczna skrzynka na świąteczne listy Twojej rodziny i przyjaciół
+          </p>
+        </header>
+
+        <!-- Room Entry Section -->
+        <div class="home-entry-card">
+          <label class="home-input-label" for="homeRoomInput">
+            Masz już kod swojej skrzynki?
+          </label>
+          <div class="home-input-group">
+            <span class="home-input-prefix">/</span>
+            <input id="homeRoomInput"
+                   type="text"
+                   class="home-room-input"
+                   [(ngModel)]="homeRoomCode"
+                   (keydown.enter)="submitHomeRoomCode()"
+                   placeholder="np. kowalscy, rodzinka..."
+                   autocomplete="off"
+                   autocapitalize="none"
+                   autocorrect="off"
+                   spellcheck="false" />
+            <button type="button"
+                    class="parchment-btn home-btn-enter"
+                    (click)="submitHomeRoomCode()"
+                    [disabled]="isCheckingHomeRoom || !homeRoomCode.trim()">
+              {{ isCheckingHomeRoom ? 'Szukam...' : 'Wejdź ➔' }}
+            </button>
+          </div>
+
+          @if (homeRoomError) {
+            <p class="home-error-msg">{{ homeRoomError }}</p>
+          }
+        </div>
+
+        <!-- Separator -->
+        <div class="home-divider">
+          <span class="divider-line"></span>
+          <span class="divider-text">lub</span>
+          <span class="divider-line"></span>
+        </div>
+
+        <!-- Create New Room Action -->
+        <div class="home-create-section">
+          <button type="button" class="parchment-btn home-btn-create" (click)="openCreatePageModal($event)">
+            ✨ Utwórz nową rodzinną skrzynkę
+          </button>
+          <span class="home-create-hint">Własny adres URL i sekretne hasło w kilkanaście sekund</span>
+        </div>
+
+        <!-- 3 Storybook Highlights -->
+        <div class="home-features-grid">
+          <div class="home-feature-item">
+            <span class="feature-icon">🦉</span>
+            <h4 class="feature-title">Sowia Poczta</h4>
+            <p class="feature-text">Śnieżna sowa Hedwiga zabiera każdy list prosto w rozgwieżdżone niebo.</p>
+          </div>
+
+          <div class="home-feature-item">
+            <span class="feature-icon">🎁</span>
+            <h4 class="feature-title">Sekretne Prezenty</h4>
+            <p class="feature-text">Dzieci wpisują marzenia, a dorośli dyskretnie zaznaczają i rezerwują podarki.</p>
+          </div>
+
+          <div class="home-feature-item">
+            <span class="feature-icon">🕯️</span>
+            <h4 class="feature-title">Ciepło i Prywatność</h4>
+            <p class="feature-text">Każda skrzynka jest chroniona sekretnym hasłem przed nieproszonymi gośćmi.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <!-- PASSWORD PROMPT FOR currentRoomCode -->
+    <div class="floating-input-stage" [class.stage-moving-up]="pwMovingUp">
+      <div class="room-indicator-badge">
+        <span class="room-label">Skrzynka: <strong>/{{ currentRoomCode }}</strong></span>
+        <button type="button" class="room-change-btn" (click)="resetToHome()" title="Wróć na stronę główną">✕ zmień</button>
+      </div>
+
+      <div class="floating-input-wrap"
+           [class.input-shaking]="shakeError"
+           (click)="focusInput()">
+        
+        <!-- Native Hidden Input for Keyboard Focus -->
+        <input #pwInputRef
+               type="text"
+               class="native-floating-input"
+               [(ngModel)]="pw"
+               (ngModelChange)="onPwChange()"
+               (keydown.enter)="submitPassword()"
+               [disabled]="busy || isSubmitting"
+               autocomplete="off"
+               autocapitalize="none"
+               autocorrect="off"
+               spellcheck="false"
+               autofocus />
+
+        <!-- Rendered Handwritten Characters (Ample height so 'l' is NEVER cut off!) -->
+        <div class="floating-text-line">
+          @if (pwLetters.length === 0) {
+            <span class="floating-placeholder">
+              Podaj hasło...
+            </span>
+          } @else {
+            @for (item of pwLetters; track item.id; let idx = $index) {
+              <span #letterDomRef
+                    class="floating-char"
+                    [class.char-red]="pwState === 'error'"
+                    [class.char-gold]="pwState !== 'error'"
+                    [class.char-dissolving]="item.dissolved">
+                {{ item.char }}
+              </span>
+            }
+          }
+          @if (!isSubmitting) {
+            <span class="floating-quill-caret" [class.at-start]="pwLetters.length === 0"></span>
+          }
+        </div>
+
+        <!-- Subtle Golden Underline in the Air -->
+        <div class="floating-gold-line" [class.line-red]="pwState === 'error'"></div>
+      </div>
+    </div>
+  }
 }
 
 <!-- PURE GOLDEN FAIRYTALE STAR BUTTON (Z góry, nie najeżdża na listy!) -->
@@ -154,11 +377,13 @@
 
 <!-- MAIN VIEW: GALLERY OF FLOATING ENVELOPES -->
 @if (phase === 'main') {
-  <main class="letters-sky-gallery">
-    @if (letters.length === 0 && !busy) {
-      <div class="empty-sky-note">
+  <main class="letters-sky-gallery" [class.gallery-empty]="hasFetchedLetters && letters.length === 0">
+    @if (hasFetchedLetters && letters.length === 0 && !busy) {
+      <div class="empty-sky-note" (click)="createNewLetter()" title="Napisz pierwszy list do Mikołaja">
+        <span class="empty-sky-icon">✦</span>
         <p class="empty-sky-title">Poczta Świętego Mikołaja czeka na Twój list</p>
-        <p class="empty-sky-sub">Dotknij złotej gwiazdy na niebie, by wysłać życzenia sową.</p>
+        <p class="empty-sky-sub">Dotknij złotej gwiazdy na niebie lub tego okienka, by wysłać życzenia sową.</p>
+        <button class="empty-sky-action-btn">Napisz list do Mikołaja ✉</button>
       </div>
     }
 
@@ -168,10 +393,80 @@
              [attr.data-id]="l.id"
              [class.slot-away]="l.away"
              [class.slot-removing]="l.removing"
+             [class.slot-dementor]="l.dementorAttacking"
              [style.--drift-dur]="(4.4 + (idx % 3) * 0.9) + 's'"
              [style.--drift-delay]="(idx * 0.45) + 's'"
              [style.--rot]="((idx % 2 === 0 ? -1.8 : 1.8) + (idx % 3) * 0.5) + 'deg'"
              (click)="openLetter(l, $event)">
+          
+          <!-- SKRZAT CELEBRATION (Warsztat Elfów - Zarezerwowano prezent!) -->
+          @if (elfCheeringLetterId === l.id) {
+            <div class="elf-tile-celebration">
+              <div class="elf-mini-scene">
+                <svg class="elf-mini-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="miniElfSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#dfcfb8" />
+                      <stop offset="100%" stop-color="#c4b096" />
+                    </linearGradient>
+                  </defs>
+                  <!-- Ears -->
+                  <path d="M 45 48 C 25 40 5 22 2 18 C 1 16 8 36 24 50 C 34 58 42 55 45 48 Z" fill="url(#miniElfSkin)" stroke="#8c735a" stroke-width="1.2" />
+                  <path d="M 75 48 C 95 40 115 22 118 18 C 119 16 112 36 96 50 C 86 58 78 55 75 48 Z" fill="url(#miniElfSkin)" stroke="#8c735a" stroke-width="1.2" />
+                  <!-- Elf Cap -->
+                  <path d="M 38 42 Q 60 12 78 28 Q 95 10 98 18 Q 80 40 82 42 Z" fill="#b83232" stroke="#d4af37" stroke-width="1.2" />
+                  <circle cx="98" cy="18" r="3.5" fill="#ffd700" />
+                  <!-- Elf Head -->
+                  <ellipse cx="60" cy="52" rx="20" ry="21" fill="url(#miniElfSkin)" stroke="#8c735a" stroke-width="1.2" />
+                  <!-- Big Eyes -->
+                  <ellipse cx="52" cy="49" rx="5.5" ry="7" fill="#fffdec" />
+                  <circle cx="53" cy="50" r="3.2" fill="#3a5a40" />
+                  <circle cx="54" cy="49" r="1.2" fill="#ffffff" />
+                  <ellipse cx="68" cy="49" rx="5.5" ry="7" fill="#fffdec" />
+                  <circle cx="67" cy="50" r="3.2" fill="#3a5a40" />
+                  <circle cx="68" cy="49" r="1.2" fill="#ffffff" />
+                  <!-- Cheerful Smile -->
+                  <path d="M 54 62 Q 60 67 66 62" fill="none" stroke="#6e5038" stroke-width="1.8" stroke-linecap="round" />
+                  <!-- Red Wooden Stamp -->
+                  <rect x="42" y="70" width="36" height="14" rx="3" fill="#a62929" stroke="#ffd700" stroke-width="1" />
+                  <text x="60" y="80" font-family="'Cinzel', serif" font-size="7.5" font-weight="bold" fill="#ffd700" text-anchor="middle">ELF ✓</text>
+                </svg>
+                <div class="elf-celebrate-badge">
+                  <span class="badge-star">✦</span>
+                  <span class="badge-text">Zaklepane!</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- DEMENTOR APPARITION (Harry Potter Deletion Sequence) -->
+          @if (l.dementorAttacking) {
+            <div class="dementor-apparition">
+              <svg class="dementor-svg" viewBox="0 0 160 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="dementorAura" cx="50%" cy="40%" r="50%">
+                    <stop offset="0%" stop-color="#0a1224" stop-opacity="0.95" />
+                    <stop offset="70%" stop-color="#030611" stop-opacity="0.8" />
+                    <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+                  </radialGradient>
+                  <linearGradient id="cloakShade" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#141c2e" />
+                    <stop offset="45%" stop-color="#090d16" />
+                    <stop offset="100%" stop-color="#020409" />
+                  </linearGradient>
+                </defs>
+                <ellipse cx="80" cy="100" rx="70" ry="90" fill="url(#dementorAura)" filter="blur(8px)" />
+                <path d="M54,46 C54,18 106,18 106,46 C106,64 100,75 80,78 C60,75 54,64 54,46 Z" fill="url(#cloakShade)" />
+                <ellipse cx="80" cy="50" rx="14" ry="20" fill="#000000" />
+                <ellipse cx="80" cy="55" rx="6" ry="9" fill="#020814" />
+                <path d="M76,57 Q80,62 84,57" stroke="#38bdf8" stroke-width="1.2" opacity="0.7" fill="none" />
+                <path d="M56,46 C36,65 24,115 16,185 C28,172 38,188 48,168 C56,188 66,160 76,192 C86,165 94,188 104,166 C114,188 126,170 138,186 C130,120 120,65 104,46 Z" fill="url(#cloakShade)" />
+                <path d="M42,95 C30,110 20,135 15,145 M15,145 L10,154 M15,145 L18,155 M15,145 L24,152" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+                <path d="M118,95 C130,110 140,135 145,145 M145,145 L150,154 M145,145 L142,155 M145,145 L136,152" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+                <path d="M30,175 Q20,205 14,218 M52,170 Q46,200 40,215 M80,185 Q78,208 76,219 M110,170 Q116,200 122,216 M132,178 Q140,205 148,218" stroke="#0f172a" stroke-width="3.5" stroke-linecap="round" opacity="0.85" />
+              </svg>
+            </div>
+          }
           
           <div class="envelope-parchment">
             <svg class="envelope-flap-sketch" viewBox="0 0 250 165" preserveAspectRatio="none">
@@ -179,16 +474,10 @@
               <path d="M4,161 L88,96 M246,161 L162,96" fill="none" stroke="#8c673a" stroke-width="1.1" opacity="0.3" />
             </svg>
 
-            <!-- Delete Button: INSIDE the envelope card, always visible and accessible! -->
-            <button class="delete-envelope-btn"
-                    (click)="deleteLetter(l, $event)"
-                    title="Usuń list ze skrzynki"
-                    [disabled]="busy">✕</button>
-
             <div class="envelope-inner-border"></div>
             
-            <!-- Red Wax Seal with Hand-Drawn Embossed Emblem -->
-            <div class="wax-seal-badge">
+            <!-- Red Wax Seal with Hand-Drawn Embossed Emblem (Secret 5-click easter egg to summon Dementor) -->
+            <div class="wax-seal-badge" (click)="onSealClick(l, $event)">
               <span class="seal-glyph">✦</span>
             </div>
 
@@ -285,7 +574,7 @@
        [style.--start-y]="flight.startY + 'px'"
        [style.--target-x]="flight.targetX + 'px'"
        [style.--target-y]="flight.targetY + 'px'">
-    <ng-container *ngTemplateOutlet="owl; context: { cargo: !!flight.cargoName, name: flight.cargoName }"/>
+    <ng-container *ngTemplateOutlet="owl; context: { cargo: flight.hasCargo ?? (flight.mode === 'deliver' || flight.mode === 'carry-climb'), name: (flight.cargoName || 'List do Mikołaja') }"/>
   </div>
 }
 
@@ -474,6 +763,169 @@
           }
         </div>
       </div>
+    </div>
+  </div>
+}
+
+<!-- TURBO DROBNE W ROGU NA DOLE (dyskretne, nie rzuca się w oczy) -->
+<aside class="corner-guide-dock">
+  <button type="button" class="corner-guide-link" (click)="openGuideModal($event)" title="Instrukcja Poczty Mikołaja">
+    <span class="guide-link-icon">📜</span> Instrukcja
+  </button>
+</aside>
+
+<aside class="corner-admin-dock">
+  @if (currentRoomCode) {
+    <span class="corner-room-label">/{{ currentRoomCode }}</span>
+  }
+  <button type="button" class="corner-create-link" (click)="openCreatePageModal($event)" title="Utwórz nową stronę z listami">
+    ✦ nowa strona
+  </button>
+</aside>
+
+<!-- OWL GUIDE POPUP (Pojawia się w dole ekranu po przelocie Mikołaja) -->
+@if (showGuidePrompt && phase === 'main') {
+  <div class="guide-owl-popup" (click)="openGuideModal($event)">
+    <div class="guide-owl-avatar">
+      <span class="guide-owl-emoji">🦉</span>
+      <span class="guide-exclamation-seal">!</span>
+    </div>
+    <div class="guide-owl-bubble">
+      <div class="guide-bubble-title">Hedwiga przyniosła list!</div>
+      <div class="guide-bubble-text">Kliknij tutaj, aby przeczytać instrukcję poczty.</div>
+    </div>
+    <button type="button" class="guide-popup-dismiss" (click)="dismissGuidePrompt($event)" title="Zamknij podpowiedź">✕</button>
+  </div>
+}
+
+<!-- GUIDE FULL MODAL (Świąteczny przewodnik) -->
+@if (showGuideModal) {
+  <div class="guide-modal-backdrop" (click)="closeGuideModal()">
+    <div class="guide-modal-scroll" (click)="$event.stopPropagation()">
+      <div class="scroll-corner top-left"></div>
+      <div class="scroll-corner top-right"></div>
+      <div class="scroll-corner bottom-left"></div>
+      <div class="scroll-corner bottom-right"></div>
+
+      <div class="guide-wax-seal">
+        <span class="seal-icon">✦</span>
+      </div>
+
+      <button type="button" class="guide-modal-close" (click)="closeGuideModal()" title="Zamknij">✕</button>
+
+      <header class="guide-header">
+        <div class="guide-emblem">🎄 ✨ 🦉</div>
+        <h2 class="guide-title">Jak działa Poczta Mikołaja?</h2>
+        <p class="guide-subtitle">Magiczny przewodnik dla Ciebie i Twojej rodziny</p>
+      </header>
+
+      <div class="guide-cards-list">
+        <div class="guide-step-card">
+          <div class="step-icon-wrap">🦉</div>
+          <div class="step-content">
+            <h4 class="step-title">1. Listy na skrzydłach sów</h4>
+            <p class="step-text">
+              Kliknij złotą gwiazdkę na samej górze nieba, aby napisać list (dla dorosłych lub dzieci).
+              Po kliknięciu <em>„Wyślij list sową”</em> śnieżna sowa Hedwiga zabiera kopertę w dziobie
+              i dostarcza ją prosto na rozgwieżdżone niebo!
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-step-card">
+          <div class="step-icon-wrap">🎁</div>
+          <div class="step-content">
+            <h4 class="step-title">2. Sekretne rezerwowanie prezentów</h4>
+            <p class="step-text">
+              W listach dziecięcych (oznaczonych jako <em>Warsztat Elfów</em>) rodzina może dyskretnie
+              zaznaczyć podarek i przybić <strong>pieczątkę Elfów</strong>. Prezent zostaje zaklepany,
+              a mały skrzat daje znać, że ktoś już o niego zadbał — bez ryzyka zdublowania niespodzianki!
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-step-card">
+          <div class="step-icon-wrap">🕯️</div>
+          <div class="step-content">
+            <h4 class="step-title">3. Bezpieczny rodzinny kącik</h4>
+            <p class="step-text">
+              Każda skrzynka (np. <code>/kowalscy</code>) jest chroniona sekretnym hasłem. Wystarczy
+              przesłać link do skrzynki swoim bliskim, aby wspólnie mogli czytać listy i szykować podarki pod choinkę.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-footer-action">
+        <button type="button" class="parchment-btn guide-btn-ok" (click)="closeGuideModal()">
+          Wszystko jasne, dziękuję! ✨
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- TURBO MAŁE OKIENKO: TWORZENIE NOWEJ STRONY Z KODEM I HASŁEM -->
+@if (showCreatePageModal) {
+  <div class="create-page-backdrop" (click)="closeCreatePageModal()">
+    <div class="create-page-popup" (click)="$event.stopPropagation()">
+      <button class="popup-close-btn" (click)="closeCreatePageModal()" title="Zamknij">✕</button>
+
+      <div class="popup-header">
+        <span class="popup-star">✦</span>
+        <h3 class="popup-title">Nowa Świąteczna Strona</h3>
+        <p class="popup-sub">Własny adres dla Twojej rodziny lub znajomych</p>
+      </div>
+
+      <form (ngSubmit)="submitCreatePage()" class="popup-form">
+        <div class="popup-field">
+          <label class="popup-label">Adres strony (kod w URL):</label>
+          <div class="url-input-wrap">
+            <span class="url-prefix">localhost:4200/</span>
+            <input type="text"
+                   class="popup-input code-input"
+                   [(ngModel)]="newPageCode"
+                   name="newPageCode"
+                   placeholder="np. kowalscy2026"
+                   required
+                   autocomplete="off"
+                   autofocus />
+          </div>
+          <small class="popup-hint">Litery, cyfry i myślniki (min. 3 znaki)</small>
+        </div>
+
+        <div class="popup-field">
+          <label class="popup-label">Hasło dostępu:</label>
+          <input type="password"
+                 class="popup-input password-input"
+                 [(ngModel)]="newPagePassword"
+                 name="newPagePassword"
+                 placeholder="Wpisz hasło do strony..."
+                 required
+                 autocomplete="off" />
+          <small class="popup-hint">Wymagane do wejścia w latającym polu</small>
+        </div>
+
+        @if (createPageError) {
+          <div class="popup-alert error-alert">
+            ⚠️ {{ createPageError }}
+          </div>
+        }
+        @if (createPageSuccess) {
+          <div class="popup-alert success-alert">
+            ✓ {{ createPageSuccess }}
+          </div>
+        }
+
+        <div class="popup-actions">
+          <button type="button" class="popup-btn-cancel" (click)="closeCreatePageModal()">Anuluj</button>
+          <button type="submit"
+                  class="popup-btn-submit"
+                  [disabled]="isCreatingPage || !newPageCode.trim() || !newPagePassword.trim()">
+            {{ isCreatingPage ? 'Tworzenie...' : '✨ Stwórz stronę' }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 }
