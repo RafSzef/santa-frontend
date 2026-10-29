@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: santa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: santa
+      POSTGRES_USER: santa_user
+      POSTGRES_PASSWORD: santa_secure_password_2026
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U santa_user -d santa"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../santa-backend
+      dockerfile: Dockerfile
+    container_name: santa-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/santa
+      SPRING_DATASOURCE_USERNAME: santa_user
+      SPRING_DATASOURCE_PASSWORD: santa_secure_password_2026
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    expose:
+      - "8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: santa-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data:
