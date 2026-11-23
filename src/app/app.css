@@ -1814,9 +1814,8 @@
   box-shadow: 0 2px 8px rgba(180, 130, 35, 0.15);
 }
 
-/* Claimed / Stamped state (Zaopatrzony / Zaopiekowany przez Elfy -> wyszarzenie i koniec interakcji) */
+/* Claimed / Stamped state (Zaopatrzony / Zaopiekowany przez Elfy -> wyszarzenie, ale link pozostaje klikalny) */
 .gift-item-row.gift-row-claimed {
-  pointer-events: none;
   user-select: none;
 }
 
@@ -1831,7 +1830,6 @@
 .gift-display-item.gift-display-claimed {
   background: rgba(140, 132, 118, 0.14);
   border-bottom: 1px dotted rgba(130, 122, 110, 0.35);
-  pointer-events: none;
   user-select: none;
 }
 
@@ -1843,11 +1841,27 @@
 .gift-display-item.gift-display-claimed .gift-title-wrap {
   opacity: 0.52;
   filter: grayscale(0.85);
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.gift-display-item.gift-display-claimed .gift-title-wrap:has(.gift-storybook-link:hover) {
+  opacity: 0.9;
+  filter: none;
+}
+
+.gift-display-item.gift-display-claimed .gift-storybook-link {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .claimed-strikethrough {
   text-decoration: line-through;
   color: #6e6459 !important;
+}
+
+.gift-storybook-link.claimed-strikethrough:hover {
+  color: #8a1f1f !important;
+  text-decoration: underline line-through;
 }
 
 .gift-title-wrap {
@@ -2553,7 +2567,7 @@
   border: 2px solid #b89758;
   border-radius: 16px;
   padding: 34px 26px 28px;
-  box-shadow: 
+  box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.65),
     0 0 40px rgba(212, 175, 55, 0.2),
     inset 0 0 45px rgba(110, 75, 38, 0.22);
@@ -2611,7 +2625,7 @@
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #bf3232, #7a1515);
   border: 2px solid #e6b800;
-  box-shadow: 
+  box-shadow:
     0 6px 16px rgba(0, 0, 0, 0.5),
     inset 0 2px 4px rgba(255, 255, 255, 0.35),
     inset 0 -2px 5px rgba(0, 0, 0, 0.5);
@@ -2885,7 +2899,7 @@
   border: 2px solid #b89758;
   border-radius: 18px;
   padding: 36px 30px 28px;
-  box-shadow: 
+  box-shadow:
     0 22px 65px rgba(0, 0, 0, 0.65),
     0 0 50px rgba(212, 175, 55, 0.25),
     inset 0 0 55px rgba(110, 75, 38, 0.2);
@@ -2905,7 +2919,7 @@
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #bf3232, #7a1515);
   border: 2px solid #e6b800;
-  box-shadow: 
+  box-shadow:
     0 6px 16px rgba(0, 0, 0, 0.5),
     inset 0 2px 4px rgba(255, 255, 255, 0.35),
     inset 0 -2px 5px rgba(0, 0, 0, 0.5);
@@ -3341,7 +3355,7 @@
   border: 1.8px solid #c2a878;
   border-radius: 30px;
   padding: 8px 16px 8px 12px;
-  box-shadow: 
+  box-shadow:
     0 12px 35px rgba(0, 0, 0, 0.55),
     0 0 25px rgba(212, 175, 55, 0.3);
   cursor: pointer;
@@ -3456,7 +3470,7 @@
   border: 2px solid #b89758;
   border-radius: 18px;
   padding: 34px 26px 24px;
-  box-shadow: 
+  box-shadow:
     0 22px 65px rgba(0, 0, 0, 0.65),
     0 0 45px rgba(212, 175, 55, 0.25),
     inset 0 0 50px rgba(110, 75, 38, 0.2);
@@ -3474,7 +3488,7 @@
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #bf3232, #7a1515);
   border: 2px solid #e6b800;
-  box-shadow: 
+  box-shadow:
     0 6px 16px rgba(0, 0, 0, 0.5),
     inset 0 2px 4px rgba(255, 255, 255, 0.35);
   display: flex;

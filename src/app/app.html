@@ -125,23 +125,23 @@
 
           <!-- Left House-Elf Bat Ear (Twitches with CSS animation!) -->
           <g class="elf-ear-left">
-            <path d="M 95 80 C 60 70 20 40 10 32 C 8 30 18 60 45 85 C 65 100 85 95 95 80 Z" 
+            <path d="M 95 80 C 60 70 20 40 10 32 C 8 30 18 60 45 85 C 65 100 85 95 95 80 Z"
                   fill="url(#elfSkin)" stroke="#8c735a" stroke-width="2" />
-            <path d="M 85 80 C 60 70 30 48 24 44 C 34 65 55 84 75 88 Z" 
+            <path d="M 85 80 C 60 70 30 48 24 44 C 34 65 55 84 75 88 Z"
                   fill="#c8a892" opacity="0.65" />
           </g>
 
           <!-- Right House-Elf Bat Ear (Twitches in counter-sync!) -->
           <g class="elf-ear-right">
-            <path d="M 145 80 C 180 70 220 40 230 32 C 232 30 222 60 195 85 C 175 100 155 95 145 80 Z" 
+            <path d="M 145 80 C 180 70 220 40 230 32 C 232 30 222 60 195 85 C 175 100 155 95 145 80 Z"
                   fill="url(#elfSkin)" stroke="#8c735a" stroke-width="2" />
-            <path d="M 155 80 C 180 70 210 48 216 44 C 206 65 185 84 165 88 Z" 
+            <path d="M 155 80 C 180 70 210 48 216 44 C 206 65 185 84 165 88 Z"
                   fill="#c8a892" opacity="0.65" />
           </g>
 
           <!-- Tattered Pillowcase Tunic with Christmas Sock Patch -->
           <path d="M 90 115 Q 120 105 150 115 L 165 160 Q 120 168 75 160 Z" fill="url(#tunicGrad)" />
-          <path d="M 100 130 L 112 130 L 114 145 L 120 148 L 117 154 L 105 154 L 105 130 Z" 
+          <path d="M 100 130 L 112 130 L 114 145 L 120 148 L 117 154 L 105 154 L 105 130 Z"
                 fill="#b83232" stroke="#d4af37" stroke-dasharray="2,2" stroke-width="1.2" />
 
           <!-- Elf Head -->
@@ -186,7 +186,7 @@
 
       <!-- Heading & Story Text -->
       <h1 class="notfound-title">Skrzaty schowały tę stronę!</h1>
-      
+
       <p class="notfound-desc">
         Ojej! Psotne skrzaty domowe zwinęły tę skrzynkę pod osłoną nocy,
         zawinęły w stary pergamin i ukryły głęboko w zakamarkach zamku.
@@ -316,7 +316,7 @@
       <div class="floating-input-wrap"
            [class.input-shaking]="shakeError"
            (click)="focusInput()">
-        
+
         <!-- Native Hidden Input for Keyboard Focus -->
         <input #pwInputRef
                type="text"
@@ -398,7 +398,7 @@
              [style.--drift-delay]="(idx * 0.45) + 's'"
              [style.--rot]="((idx % 2 === 0 ? -1.8 : 1.8) + (idx % 3) * 0.5) + 'deg'"
              (click)="openLetter(l, $event)">
-          
+
           <!-- SKRZAT CELEBRATION (Warsztat Elfów - Zarezerwowano prezent!) -->
           @if (elfCheeringLetterId === l.id) {
             <div class="elf-tile-celebration">
@@ -467,7 +467,7 @@
               </svg>
             </div>
           }
-          
+
           <div class="envelope-parchment">
             <svg class="envelope-flap-sketch" viewBox="0 0 250 165" preserveAspectRatio="none">
               <path d="M4,4 L125,74 L246,4" fill="none" stroke="#8c673a" stroke-width="1.4" stroke-dasharray="4,2" opacity="0.45" />
@@ -475,7 +475,7 @@
             </svg>
 
             <div class="envelope-inner-border"></div>
-            
+
             <!-- Red Wax Seal with Hand-Drawn Embossed Emblem (Secret 5-click easter egg to summon Dementor) -->
             <div class="wax-seal-badge" (click)="onSealClick(l, $event)">
               <span class="seal-glyph">✦</span>
@@ -583,11 +583,11 @@
   <div class="modal-backdrop"
        [class.backdrop-closing]="isClosing"
        (click)="closeModal()">
-    
+
     <div class="parchment-sheet"
          [class.sheet-folding]="isFolding || isClosing"
          (click)="$event.stopPropagation()">
-      
+
       <!-- Top Fold: Title, Letter Type & Sender -->
       <div class="parchment-fold fold-top">
         <div class="fairytale-ribbon">
@@ -703,13 +703,14 @@
                     <span class="gift-bullet-star">✦</span>
                   }
 
-                  <!-- Gift Name / Link (if claimed, interaction ends: rendered as muted text with strikethrough) -->
+                  <!-- Gift Name / Link (remains clickable even after Elf Stamp so one can preview the chosen gift) -->
                   <div class="gift-title-wrap">
-                    @if (gift.url && !(activeLetter.type === 'child' && gift.claimed)) {
+                    @if (gift.url) {
                       <a [href]="formatUrl(gift.url)"
                          target="_blank"
                          rel="noopener noreferrer"
-                         class="gift-storybook-link">
+                         class="gift-storybook-link"
+                         [class.claimed-strikethrough]="activeLetter.type === 'child' && gift.claimed">
                         {{ gift.name || gift.url }}
                         <span class="external-icon">↗</span>
                       </a>
